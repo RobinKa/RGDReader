@@ -7,12 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RGDReader", "RGDReader\RGDR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RGDViewer", "RGDViewer\RGDViewer.csproj", "{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGDReaderCLI", "RGDReaderCLI\RGDReaderCLI.csproj", "{367022A4-BD85-4723-B139-6C1109E35195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RGDReaderCLI", "RGDReaderCLI\RGDReaderCLI.csproj", "{367022A4-BD85-4723-B139-6C1109E35195}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A346109-C2D4-41F9-8E94-8378623EF327}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGDJSONConverter", "RGDJSONConverter\RGDJSONConverter.csproj", "{6CE167A1-D33F-44D8-88EB-2B2E978969B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{367022A4-BD85-4723-B139-6C1109E35195}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{367022A4-BD85-4723-B139-6C1109E35195}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{367022A4-BD85-4723-B139-6C1109E35195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CE167A1-D33F-44D8-88EB-2B2E978969B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE167A1-D33F-44D8-88EB-2B2E978969B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE167A1-D33F-44D8-88EB-2B2E978969B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE167A1-D33F-44D8-88EB-2B2E978969B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
