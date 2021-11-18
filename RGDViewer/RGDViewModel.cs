@@ -45,7 +45,7 @@ namespace RGDViewer
 
         public string DisplayValue
         {
-            get => string.Format("{0} <0x{1:X8}>: [{2}] {3}", Key, Hash, typeDisplayName[Type], Value is IReadOnlyDictionary<ulong, (int Type, object Value)> table ? $"Count: {table.Count}" : Value);
+            get => string.Format("{0} <0x{1:X8}>: [{2}] {3}", Key, Hash, typeDisplayName[Type], Value is IList<(ulong Key, int Type, object Value)> table ? $"Count: {table.Count}" : Value);
         }
 
         public ObservableCollection<RGDViewModel> Children
