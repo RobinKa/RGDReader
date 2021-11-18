@@ -82,18 +82,18 @@ namespace RGDViewer
                         {
                             var childViewModels = new List<RGDViewModel>();
 
-                            if (node.Value is IReadOnlyDictionary<ulong, (int Type, object Value)> nodeChildren)
+                            if (node.Value is IList<(ulong Key, int Type, object Value)> nodeChildren)
                             {
                                 foreach (var child in nodeChildren)
                                 {
-                                    childViewModels.Add(nodeToViewModel((child.Key, child.Value.Type, child.Value.Value)));
+                                    childViewModels.Add(nodeToViewModel((child.Key, child.Type, child.Value)));
                                 }
                             }
 
                             return new RGDViewModel(keysInv[node.Hash], node.Hash, node.Type, node.Value, childViewModels);
                         }
 
-                        rootChildren = kvs.KeyValues.Select(kv => nodeToViewModel((kv.Key, kv.Value.Type, kv.Value.Value))).ToArray();
+                        rootChildren = kvs.KeyValues.Select(kv => nodeToViewModel((kv.Key, kv.Type, kv.Value))).ToArray();
                     }
                 }
 

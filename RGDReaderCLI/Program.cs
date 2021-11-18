@@ -49,12 +49,11 @@ while (reader.BaseStream.Position < reader.BaseStream.Length)
 if (kvs != null && keys != null)
 {
     var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
-    var resolved = ChunkyUtil.ResolveKeyValues(keys, kvs);
     Console.WriteLine("All key-values");
 
-    void printTable(IReadOnlyDictionary<ulong, (int Type, object Value)> table, int indent = 0)
+    void printTable(IList<(ulong Key, int Type, object Value)> table, int indent = 0)
     {
-        foreach (var (childKey, (childType, childValue)) in table)
+        foreach (var (childKey, childType, childValue) in table)
         {
             printValue(childKey, childType, childValue, indent + 1);
         }
@@ -64,7 +63,7 @@ if (kvs != null && keys != null)
     {
         Console.Write(string.Join("", Enumerable.Range(0, indent).Select(_ => "  ")));
         Console.Write(keysInv.GetValueOrDefault(key, "<Unknown>"));
-        if (value is IReadOnlyDictionary<ulong, (int Type, object Value)> table)
+        if (value is IList<(ulong Key, int Type, object Value)> table)
         {
             Console.WriteLine(" [Table]");
             printTable(table, indent + 1);

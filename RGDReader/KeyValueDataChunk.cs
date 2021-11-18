@@ -1,3 +1,3 @@
 ﻿namespace RGDReader;
 
-public record class KeyValueDataChunk(IReadOnlyDictionary<ulong, (int Type, object Value)> KeyValues);
+public record class KeyValueDataChunk(IList<(ulong Key, int Type, object Value)> KeyValues);

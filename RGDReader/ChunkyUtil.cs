@@ -13,7 +13,7 @@ public static class ChunkyUtil
         return dictionary;
     }
 
-    public static (int Type, object Value)? ResolveKey(ulong key, KeyValueDataChunk kvs)
+    /*public static (int Type, object Value)? ResolveKey(ulong key, KeyValueDataChunk kvs)
     {
         if (kvs.KeyValues.TryGetValue(key, out var result))
         {
@@ -31,5 +31,5 @@ public static class ChunkyUtil
             resolved[stringKey] = ResolveKey(key, kvs);
         }
         return resolved;
-    }
+    }*/
 }

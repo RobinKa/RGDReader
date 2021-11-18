@@ -64,32 +64,32 @@ public class ChunkyFileReader : BinaryReader
             3 => ReadCString(),
             100 => ReadTable(),
             101 => ReadTable(),
-            _ => throw new Exception()
+            _ => throw new Exception($"Unknown type {type}")
         };
     }
 
-    private Dictionary<ulong, (int Type, object Value)> ReadTable()
+    private List<(ulong Key, int Type, object Value)> ReadTable()
     {
         int length = ReadInt32();
 
         // Read table index
-        Dictionary<ulong, (int Type, int index)> keyTypeAndDataIndex = new();
+        List<(ulong key, int Type, int index)> keyTypeAndDataIndex = new();
         for (int i = 0; i < length; i++)
         {
             ulong key = ReadUInt64();
             int type = ReadInt32();
             int index = ReadInt32();
-            keyTypeAndDataIndex[key] = (type, index);
+            keyTypeAndDataIndex.Add((key, type, index));
         }
 
         // Read table row data
         long dataPosition = BaseStream.Position;
 
-        Dictionary<ulong, (int Type, object Value)> kvs = new();
-        foreach (var (key, (type, index)) in keyTypeAndDataIndex)
+        List<(ulong Key, int Type, object Value)> kvs = new();
+        foreach (var (key, type, index) in keyTypeAndDataIndex)
         {
             BaseStream.Position = dataPosition + index;
-            kvs[key] = (type, ReadType(type));
+            kvs.Add((key, type, ReadType(type)));
         }
 
         return kvs;

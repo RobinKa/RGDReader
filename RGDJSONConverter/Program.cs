@@ -53,7 +53,6 @@ void ConvertRGD(string rgdPath)
     if (kvs != null && keys != null)
     {
         var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
-        var resolved = ChunkyUtil.ResolveKeyValues(keys, kvs);
 
         StringBuilder stringBuilder = new StringBuilder();
         void printIndent(int indent)
@@ -64,36 +63,42 @@ void ConvertRGD(string rgdPath)
             }
         }
         
-        void printTable(IReadOnlyDictionary<ulong, (int Type, object Value)> table, bool comma = false, int indent = 0)
+        void printTable(IList<(ulong Key, int Type, object Value)> table, int indent)
         {
-            stringBuilder.Append("{\n");
+            stringBuilder.Append("[\n");
 
-            var keys = table.Keys.ToArray();
-            var count = keys.Length;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < table.Count; i++)
             {
-                var childKey = keys[i];
-                var (childType, childValue) = table[childKey];
-                printValue(childKey, childType, childValue, i + 1 != count, indent + 1);
+                var (childKey, childType, childValue) = table[i];
+
+                printIndent(indent);
+                stringBuilder.Append("{\n");
+
+                printIndent(indent + 1);
+                stringBuilder.AppendFormat("\"key\": \"{0}\",\n", keysInv[childKey]);
+                printIndent(indent + 1);
+                stringBuilder.Append("\"value\": ");
+                printValue(childType, childValue, indent + 1);
+
+                printIndent(indent);
+                stringBuilder.Append("}");
+                if (i != table.Count - 1)
+                {
+                    stringBuilder.Append(",");
+                }
+                stringBuilder.Append("\n");
             }
 
             printIndent(indent - 1);
-            stringBuilder.Append("}");
-            if (comma)
-            {
-                stringBuilder.Append(",");
-            }
+            stringBuilder.Append("]");
             stringBuilder.Append("\n");
         }
 
-        void printValue(ulong key, int type, object value, bool comma = false, int indent = 0)
+        void printValue(int type, object value, int indent)
         {
-            printIndent(indent);
-            stringBuilder.AppendFormat("\"{0}\": ", keysInv[key]);
-
-            if (value is IReadOnlyDictionary<ulong, (int Type, object Value)> table)
+            if (value is IList<(ulong Key, int Type, object Value)> table)
             {
-                printTable(table, comma, indent + 1);
+                printTable(table, indent + 1);
             }
             else
             {
@@ -104,16 +109,11 @@ void ConvertRGD(string rgdPath)
                     _ => value,
                 });
 
-                if (comma)
-                {
-                    stringBuilder.Append(",");
-                }
-
                 stringBuilder.Append("\n");
             }
         }
 
-        printTable(kvs.KeyValues);
+        printTable(kvs.KeyValues, 1);
 
         Directory.CreateDirectory(Path.GetDirectoryName(outJsonPath));
         File.WriteAllText(outJsonPath, stringBuilder.ToString());
