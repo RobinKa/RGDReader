@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31903.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RGDReader", "RGDReader\RGDReader.csproj", "{EF1FC470-75FB-4EDC-B428-A1A89BB7E9CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RGDViewer", "RGDViewer\RGDViewer.csproj", "{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGDReaderCLI", "RGDReaderCLI\RGDReaderCLI.csproj", "{367022A4-BD85-4723-B139-6C1109E35195}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A346109-C2D4-41F9-8E94-8378623EF327}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF1FC470-75FB-4EDC-B428-A1A89BB7E9CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF1FC470-75FB-4EDC-B428-A1A89BB7E9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF1FC470-75FB-4EDC-B428-A1A89BB7E9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF1FC470-75FB-4EDC-B428-A1A89BB7E9CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04BA9D26-2C18-4CF6-9D94-6BEBA01D2268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{367022A4-BD85-4723-B139-6C1109E35195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{367022A4-BD85-4723-B139-6C1109E35195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{367022A4-BD85-4723-B139-6C1109E35195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{367022A4-BD85-4723-B139-6C1109E35195}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D56030B5-A863-46A2-8F77-300BA3397DF4}
+	EndGlobalSection
+EndGlobal

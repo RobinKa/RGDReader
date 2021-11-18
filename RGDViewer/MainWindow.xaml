@@ -1,0 +1,16 @@
+﻿<Window x:Class="RGDViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RGDViewer"
+        mc:Ignorable="d"
+        Title="{Binding RGDPath}" x:Name="Wnd" Height="450" Width="800">
+    <TreeView ItemsSource="{Binding RootChildren}" AllowDrop="True" Drop="OnDrop">
+        <TreeView.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type local:RGDViewModel}" ItemsSource="{Binding Children}">
+                <TextBlock Text="{Binding DisplayValue}"></TextBlock>
+            </HierarchicalDataTemplate>
+        </TreeView.Resources>
+    </TreeView>
+</Window>
