@@ -14,7 +14,7 @@ public static class ChunkyUtil
     }
 
     public static (int Type, object Value)? ResolveKey(ulong key, KeyValueDataChunk kvs)
-{
+    {
         if (kvs.KeyValues.TryGetValue(key, out var result))
         {
             return result;
