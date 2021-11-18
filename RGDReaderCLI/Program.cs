@@ -51,18 +51,29 @@ if (kvs != null && keys != null)
     var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
     var resolved = ChunkyUtil.ResolveKeyValues(keys, kvs);
     Console.WriteLine("All key-values");
-    foreach (var kv in resolved)
+
+    void printTable(IReadOnlyDictionary<ulong, (int Type, object Value)> table, int indent = 0)
     {
-        if (kv.Value.HasValue)
+        foreach (var (childKey, (childType, childValue)) in table)
         {
-            Console.WriteLine(
-                "{0}: [{1}] <{2}>",
-                kv.Key,
-                typeDisplayName[kv.Value.Value.Type],
-                kv.Value.Value.Value is IReadOnlyDictionary<ulong, (int Type, object Value)> dict ?
-                    string.Join(", ", dict.Keys.Select(key => keysInv.GetValueOrDefault(key, "<Unknown>"))) :
-                    kv.Value.Value.Value
-            );
+            printValue(childKey, childType, childValue, indent + 1);
         }
     }
+
+    void printValue(ulong key, int type, object value, int indent = 0)
+    {
+        Console.Write(string.Join("", Enumerable.Range(0, indent).Select(_ => "  ")));
+        Console.Write(keysInv.GetValueOrDefault(key, "<Unknown>"));
+        if (value is IReadOnlyDictionary<ulong, (int Type, object Value)> table)
+        {
+            Console.WriteLine(" [Table]");
+            printTable(table, indent + 1);
+        }
+        else
+        {
+            Console.WriteLine(" [{0}] <{1}>", typeDisplayName[type], value);
+        }
+    }
+
+    printTable(kvs.KeyValues);
 }

@@ -103,24 +103,9 @@ public class ChunkyFileReader : BinaryReader
 
         var table = ReadTable();
 
-        Dictionary<ulong, (int Type, object Value)> flatTable = new();
-
-        void addToFlatTable(Dictionary<ulong, (int Type, object Value)> t)
-        {
-            foreach (var (key, tv) in t)
-            {
-                flatTable[key] = tv;
-                if (tv.Type == 100 || tv.Type == 101)
-                {
-                    addToFlatTable((Dictionary<ulong, (int Type, object Value)>)tv.Value);
-                }
-            }
-        }
-        addToFlatTable(table);
-
         BaseStream.Position = startPosition + length;
 
-        return new KeyValueDataChunk(flatTable);
+        return new KeyValueDataChunk(table);
     }
 
     public KeysDataChunk ReadKeysDataChunk()
