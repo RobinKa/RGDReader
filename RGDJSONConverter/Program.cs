@@ -4,12 +4,14 @@ using System.Text;
 
 if (args.Length != 2)
 {
+    Console.WriteLine("Usage: {0} <Directory with RGDs> <Output directory>", AppDomain.CurrentDomain.FriendlyName);
     return;
 }
 
 string path = args[0];
 string outPath = args[1];
 
+Console.WriteLine("Output directory: {0}", outPath);
 Console.WriteLine("Searching for rgd files in {0}", path);
 
 Matcher matcher = new();
@@ -113,7 +115,11 @@ void ConvertRGD(string rgdPath)
             }
         }
 
-        printTable(kvs.KeyValues, 1);
+        stringBuilder.Append("{\n");
+        printIndent(1);
+        stringBuilder.Append("\"data\": ");
+        printTable(kvs.KeyValues, 2);
+        stringBuilder.Append("}");
 
         Directory.CreateDirectory(Path.GetDirectoryName(outJsonPath));
         File.WriteAllText(outJsonPath, stringBuilder.ToString());

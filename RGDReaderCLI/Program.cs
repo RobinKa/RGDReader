@@ -1,6 +1,12 @@
 ﻿using RGDReader;
 using System.Text;
 
+if (args.Length != 1)
+{
+    Console.WriteLine("Usage: {0} <RGD File Path>", AppDomain.CurrentDomain.FriendlyName);
+    return;
+}
+
 IReadOnlyDictionary<int, string> typeDisplayName = new Dictionary<int, string>
 {
     [0] = "Float",
@@ -14,12 +20,6 @@ IReadOnlyDictionary<int, string> typeDisplayName = new Dictionary<int, string>
 string rgdPath = args[0];
 
 using var reader = new ChunkyFileReader(File.Open(rgdPath, FileMode.Open), Encoding.ASCII);
-
-if (args.Length != 1)
-{
-    Console.WriteLine("Usage: {0} <RGD File Path>", AppDomain.CurrentDomain.FriendlyName);
-    return;
-}
 
 Console.WriteLine("Reading {0}", args[0]);
 
