@@ -7,72 +7,33 @@ if (args.Length != 1)
     return;
 }
 
-IReadOnlyDictionary<int, string> typeDisplayName = new Dictionary<int, string>
-{
-    [0] = "Float",
-    [1] = "Integer",
-    [2] = "Boolean",
-    [3] = "String",
-    [100] = "Table",
-    [101] = "List",
-};
-
 string rgdPath = args[0];
 
-using var reader = new ChunkyFileReader(File.Open(rgdPath, FileMode.Open), Encoding.ASCII);
+var nodes = ChunkyUtil.ReadRGD(rgdPath);
 
-Console.WriteLine("Reading {0}", args[0]);
-
-var fileHeader = reader.ReadChunkyFileHeader();
-
-KeyValueDataChunk? kvs = null;
-KeysDataChunk? keys = null;
-
-while (reader.BaseStream.Position < reader.BaseStream.Length)
+static void PrintNode(RGDNode node, int depth = 0)
 {
-    var chunkHeader = reader.ReadChunkHeader();
-    if (chunkHeader.Type == "DATA")
+    for (int i = 0; i < depth; i++)
     {
-        if (chunkHeader.Name == "AEGD")
+        Console.Write("\t");
+    }
+    Console.Write(node.Key);
+    if (node.Value is IList<RGDNode> children)
+    {
+        Console.WriteLine();
+        foreach (var child in children)
         {
-            kvs = reader.ReadKeyValueDataChunk(chunkHeader.Length);
+            PrintNode(child, depth + 1);
         }
-
-        if (chunkHeader.Name == "KEYS")
-        {
-            keys = reader.ReadKeysDataChunk();
-            break;
-        }
+    }
+    else
+    {
+        Console.Write(": ");
+        Console.WriteLine(node.Value);
     }
 }
 
-if (kvs != null && keys != null)
+foreach (var node in nodes)
 {
-    var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
-    Console.WriteLine("All key-values");
-
-    void printTable(IList<(ulong Key, int Type, object Value)> table, int indent = 0)
-    {
-        foreach (var (childKey, childType, childValue) in table)
-        {
-            printValue(childKey, childType, childValue, indent + 1);
-        }
-    }
-
-    void printValue(ulong key, int type, object value, int indent = 0)
-    {
-        Console.Write(string.Join("", Enumerable.Range(0, indent).Select(_ => "  ")));
-        Console.Write(keysInv.GetValueOrDefault(key, "<Unknown>"));
-        if (value is IList<(ulong Key, int Type, object Value)> table)
-        {
-            Console.WriteLine(" [Table]");
-            printTable(table, indent + 1);
-        }
-        else
-        {
-            Console.WriteLine(" [{0}] <{1}>", typeDisplayName[type], value);
-        }
-    }
-
-    printTable(kvs.KeyValues);
+    PrintNode(node);
 }

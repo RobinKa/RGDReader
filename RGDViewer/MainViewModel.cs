@@ -49,52 +49,25 @@ namespace RGDViewer
                 }
                 else
                 {
-                    using var reader = new ChunkyFileReader(File.Open(RGDPath, FileMode.Open), Encoding.ASCII);
+                    var nodes = ChunkyUtil.ReadRGD(RGDPath);
 
-                    var fileHeader = reader.ReadChunkyFileHeader();
-
-                    KeyValueDataChunk? kvs = null;
-                    KeysDataChunk? keys = null;
-
-                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    RGDViewModel nodeToViewModel(RGDNode node)
                     {
-                        var chunkHeader = reader.ReadChunkHeader();
-                        if (chunkHeader.Type == "DATA")
-                        {
-                            if (chunkHeader.Name == "AEGD")
-                            {
-                                kvs = reader.ReadKeyValueDataChunk(chunkHeader.Length);
-                            }
+                        IList<RGDViewModel> childViewModels;
 
-                            if (chunkHeader.Name == "KEYS")
-                            {
-                                keys = reader.ReadKeysDataChunk();
-                                break;
-                            }
+                        if (node.Value is IList<RGDNode> nodeChildren)
+                        {
+                            childViewModels = nodeChildren.Select(node => nodeToViewModel(node)).ToArray();
                         }
-                    }
-
-                    if (kvs != null && keys != null)
-                    {
-                        var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
-
-                        RGDViewModel nodeToViewModel((ulong Hash, int Type, object Value) node)
+                        else
                         {
-                            var childViewModels = new List<RGDViewModel>();
-
-                            if (node.Value is IList<(ulong Key, int Type, object Value)> nodeChildren)
-                            {
-                                foreach (var child in nodeChildren)
-                                {
-                                    childViewModels.Add(nodeToViewModel((child.Key, child.Type, child.Value)));
-                                }
-                            }
-
-                            return new RGDViewModel(keysInv[node.Hash], node.Hash, node.Type, node.Value, childViewModels);
+                            childViewModels = new RGDViewModel[0];
                         }
 
-                        rootChildren = kvs.KeyValues.Select(kv => nodeToViewModel((kv.Key, kv.Type, kv.Value))).ToArray();
+                        return new RGDViewModel(node.Key, node.Value, childViewModels);
                     }
+
+                    rootChildren = nodes.Select(nodeToViewModel).ToArray();
                 }
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RootChildren)));
