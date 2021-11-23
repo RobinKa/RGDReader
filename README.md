@@ -1,11 +1,17 @@
 # RGD Reader
 This project provides a library, a command line interface too and a graphical user interface for reading Age of Empire 4 Relic Chunky archives such as `.rgd` and `.rrtex`.
 
+Join the AOE4 modding discord for information sharing and discussions: https://discord.gg/h8FX9Uq3vG
+
 Made with C# and .NET 6. The GUI is made with WPF.
 
 The project is mostly in a proof of concept stage right now. It can read all RGD files of AOE4 that I tried. However there are no tests yet and the code is messy.
 
+**View RGD data files**
 ![](Media/RGDViewer.png)
+
+**Convert RRTex textures**
+![](Media/RRTexConverted.png)
 
 ## Download
 See [Releases page](https://github.com/RobinKa/RGDReader/releases) for downloads.
