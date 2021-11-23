@@ -14,6 +14,8 @@ Requires .NET 6 runtime:
 - For Windows get https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-6.0.0-windows-x64-installer
 - Or see https://dotnet.microsoft.com/download/dotnet/6.0 for a complete list
 
+The library is also available on [nuget](https://www.nuget.org/packages/RGDReader/).
+
 ## Projects
 - RGDReader: Library for reading Relic Chunky archives such as .rgd, .rrtex
 - RGDReaderCLI: Command line interface for reading RGD files, usage: `RGDReaderCLI <rgd path>`
