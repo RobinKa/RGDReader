@@ -15,6 +15,24 @@ public class ChunkyFileReader : BinaryReader
     {
     }
 
+    public IEnumerable<ChunkHeader> ReadChunkHeaders(long length)
+    {
+        long startPosition = BaseStream.Position;
+        while (BaseStream.Position < startPosition + length)
+        {
+            var chunkHeader = ReadChunkHeader();
+
+            yield return chunkHeader;
+
+            BaseStream.Position = chunkHeader.DataPosition + chunkHeader.Length;
+        }
+    }
+
+    public IEnumerable<ChunkHeader> ReadChunkHeaders()
+    {
+        return ReadChunkHeaders(BaseStream.Length - BaseStream.Position);
+    }
+
     public ChunkHeader ReadChunkHeader()
     {
         return new ChunkHeader(
@@ -22,7 +40,8 @@ public class ChunkyFileReader : BinaryReader
             new string(ReadChars(4)),
             ReadInt32(),
             ReadInt32(),
-            ReadInt32()
+            Encoding.ASCII.GetString(ReadBytes(ReadInt32())),
+            BaseStream.Position
         );
     }
 
@@ -62,54 +81,53 @@ public class ChunkyFileReader : BinaryReader
             1 => ReadInt32(),
             2 => ReadBoolean(),
             3 => ReadCString(),
-            100 => ReadTable(),
-            101 => ReadTable(),
+            100 => ReadChunkyList(),
+            101 => ReadChunkyList(),
             _ => throw new Exception($"Unknown type {type}")
         };
     }
 
-    private List<(ulong Key, int Type, object Value)> ReadTable()
+    private ChunkyList ReadChunkyList()
     {
         int length = ReadInt32();
 
         // Read table index
-        List<(ulong key, int Type, int index)> keyTypeAndDataIndex = new();
+        var keyTypeAndDataIndex = new (ulong key, int Type, int index)[length];
         for (int i = 0; i < length; i++)
         {
             ulong key = ReadUInt64();
             int type = ReadInt32();
             int index = ReadInt32();
-            keyTypeAndDataIndex.Add((key, type, index));
+            keyTypeAndDataIndex[i] = (key, type, index);
         }
 
         // Read table row data
         long dataPosition = BaseStream.Position;
 
-        List<(ulong Key, int Type, object Value)> kvs = new();
+        ChunkyList kvs = new();
         foreach (var (key, type, index) in keyTypeAndDataIndex)
         {
             BaseStream.Position = dataPosition + index;
-            kvs.Add((key, type, ReadType(type)));
+            kvs.Add(new KeyValueEntry(key, ReadType(type)));
         }
 
         return kvs;
     }
 
-    public KeyValueDataChunk ReadKeyValueDataChunk(int length)
+    public KeyValueDataChunk ReadKeyValueDataChunk(ChunkHeader header)
     {
-        long startPosition = BaseStream.Position;
+        BaseStream.Position = header.DataPosition;
 
-        int unknown2 = ReadInt32();
-
-        var table = ReadTable();
-
-        BaseStream.Position = startPosition + length;
+        int unknown = ReadInt32();
+        var table = ReadChunkyList();
 
         return new KeyValueDataChunk(table);
     }
 
-    public KeysDataChunk ReadKeysDataChunk()
+    public KeysDataChunk ReadKeysDataChunk(ChunkHeader header)
     {
+        BaseStream.Position = header.DataPosition;
+
         Dictionary<string, ulong> stringKeys = new();
 
         int count = ReadInt32();
