@@ -8,6 +8,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/RobinKa/RGDReader</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
 </Project>

@@ -157,6 +157,7 @@ void ConvertRRTex(string rrtexPath)
                         18 => CompressionFormat.Bc1WithAlpha,
                         19 => CompressionFormat.Bc1,
                         22 => CompressionFormat.Bc3,
+                        28 => CompressionFormat.Bc7,
                         _ => CompressionFormat.Unknown
                     };
 
