@@ -26,104 +26,80 @@ void ConvertRGD(string rgdPath)
     var outRelativePath = Path.ChangeExtension(relativePath, "json");
     var outJsonPath = Path.Join(outPath, outRelativePath);
 
-    using var reader = new ChunkyFileReader(File.Open(rgdPath, FileMode.Open), Encoding.ASCII);
+    var nodes = ChunkyUtil.ReadRGD(rgdPath);
 
-    var fileHeader = reader.ReadChunkyFileHeader();
-
-    KeyValueDataChunk? kvs = null;
-    KeysDataChunk? keys = null;
-
-    while (reader.BaseStream.Position < reader.BaseStream.Length)
+    StringBuilder stringBuilder = new StringBuilder();
+    void printIndent(int indent)
     {
-        var chunkHeader = reader.ReadChunkHeader();
-        if (chunkHeader.Type == "DATA")
+        for (int i = 0; i < indent; i++)
         {
-            if (chunkHeader.Name == "AEGD")
-            {
-                kvs = reader.ReadKeyValueDataChunk(chunkHeader.Length);
-            }
-
-            if (chunkHeader.Name == "KEYS")
-            {
-                keys = reader.ReadKeysDataChunk();
-                break;
-            }
+            stringBuilder.Append("  ");
         }
     }
 
-
-    if (kvs != null && keys != null)
+    void printValue(RGDNode node, int depth)
     {
-        var keysInv = ChunkyUtil.ReverseReadOnlyDictionary(keys.StringKeys);
+        printIndent(depth);
+        stringBuilder.Append("{\n");
+        printIndent(depth + 1);
+        stringBuilder.AppendFormat("\"key\": \"{0}\",\n", node.Key);
+        printIndent(depth + 1);
+        stringBuilder.Append("\"value\": ");
 
-        StringBuilder stringBuilder = new StringBuilder();
-        void printIndent(int indent)
-        {
-            for (int i = 0; i < indent; i++)
-            {
-                stringBuilder.Append("  ");
-            }
-        }
-        
-        void printTable(IList<(ulong Key, int Type, object Value)> table, int indent)
+        if (node.Value is IList<RGDNode> childNodes)
         {
             stringBuilder.Append("[\n");
 
-            for (int i = 0; i < table.Count; i++)
+            for (int i = 0; i < childNodes.Count; i++)
             {
-                var (childKey, childType, childValue) = table[i];
+                printValue(childNodes[i], depth + 2);
+                var childNode = childNodes[i];
 
-                printIndent(indent);
-                stringBuilder.Append("{\n");
-
-                printIndent(indent + 1);
-                stringBuilder.AppendFormat("\"key\": \"{0}\",\n", keysInv[childKey]);
-                printIndent(indent + 1);
-                stringBuilder.Append("\"value\": ");
-                printValue(childType, childValue, indent + 1);
-
-                printIndent(indent);
-                stringBuilder.Append("}");
-                if (i != table.Count - 1)
+                if (i != childNodes.Count - 1)
                 {
                     stringBuilder.Append(",");
                 }
+
                 stringBuilder.Append("\n");
             }
 
-            printIndent(indent - 1);
+            printIndent(depth + 1);
             stringBuilder.Append("]");
             stringBuilder.Append("\n");
         }
-
-        void printValue(int type, object value, int indent)
+        else
         {
-            if (value is IList<(ulong Key, int Type, object Value)> table)
+            stringBuilder.Append(node.Value switch
             {
-                printTable(table, indent + 1);
-            }
-            else
-            {
-                stringBuilder.AppendFormat("{0}", type switch
-                {
-                    2 => (bool)value ? "true" : "false",
-                    3 => $"\"{((string)value).Replace("\\", "\\\\")}\"",
-                    _ => value,
-                });
+                bool b => b ? "true" : "false",
+                string s => $"\"{s.Replace("\\", "\\\\")}\"",
+                _ => node.Value,
+            });
 
-                stringBuilder.Append("\n");
-            }
+            stringBuilder.Append("\n");
         }
 
-        stringBuilder.Append("{\n");
-        printIndent(1);
-        stringBuilder.Append("\"data\": ");
-        printTable(kvs.KeyValues, 2);
+        printIndent(depth);
         stringBuilder.Append("}");
-
-        Directory.CreateDirectory(Path.GetDirectoryName(outJsonPath));
-        File.WriteAllText(outJsonPath, stringBuilder.ToString());
     }
+
+    stringBuilder.Append("{\n");
+    printIndent(1);
+    stringBuilder.Append("\"data\": [\n");
+    for (int i = 0; i < nodes.Count; i++)
+    {
+        printValue(nodes[i], 2);
+        if (i != nodes.Count - 1)
+        {
+            stringBuilder.Append(",");
+        }
+        stringBuilder.Append("\n");
+    }
+    printIndent(1);
+    stringBuilder.Append("]\n}");
+
+    Directory.CreateDirectory(Path.GetDirectoryName(outJsonPath));
+    File.WriteAllText(outJsonPath, stringBuilder.ToString());
 }
 
 using (var progress = new ProgressBar())

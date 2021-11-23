@@ -1,4 +1,5 @@
 ﻿using RGDReader;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -6,6 +7,15 @@ namespace RGDViewer
 {
     public class RGDViewModel
     {
+        private static IReadOnlyDictionary<Type, string> TypeName = new Dictionary<Type, string>()
+        {
+            [typeof(int)] = "Integer",
+            [typeof(float)] = "Float",
+            [typeof(string)] = "String",
+            [typeof(bool)] = "Boolean",
+            [typeof(RGDNode[])] = "List",
+        };
+
         public string Key
         {
             get;
@@ -20,7 +30,7 @@ namespace RGDViewer
 
         public string DisplayValue
         {
-            get => string.Format("{0}: {1}", Key, Children.Count == 0 ? Value : $"List size={Children.Count}");
+            get => string.Format("{0}: {1} ({2})", Key, Value is IList<RGDNode> ? $"{{{Children.Count}}}" : Value, TypeName[Value.GetType()]);
         }
 
         public ObservableCollection<RGDViewModel> Children
