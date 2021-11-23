@@ -1,14 +1,16 @@
 ﻿using RGDReader;
 using System.Text;
 using System.IO.Compression;
-using System.Drawing;
 using BCnEncoder.Decoder;
 using BCnEncoder.Shared;
 using Microsoft.Extensions.FileSystemGlobbing;
+using SixLabors.ImageSharp;
+using BCnEncoder.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 if (args.Length != 2)
 {
-    Console.WriteLine("Usage: {0} <Directory with RGDs> <Output directory>", AppDomain.CurrentDomain.FriendlyName);
+    Console.WriteLine("Usage: {0} <Directory with rrtex files> <Output directory>", AppDomain.CurrentDomain.FriendlyName);
     return;
 }
 
@@ -22,7 +24,9 @@ Matcher matcher = new();
 matcher.AddInclude("**/*.rrtex");
 
 var rgdPaths = matcher.GetResultsInFullPath(path).ToArray();
-Console.WriteLine("Found {0} rgd files", rgdPaths.Length);
+Console.WriteLine("Found {0} rrtex files", rgdPaths.Length);
+
+List<string> unhandledTextureMessages = new();
 
 void ConvertRRTex(string rrtexPath)
 {
@@ -147,49 +151,29 @@ void ConvertRRTex(string rrtexPath)
 
                     var decoder = new BcDecoder();
 
-
                     var format = textureCompression switch
                     {
+                        2 => CompressionFormat.R,
                         18 => CompressionFormat.Bc1WithAlpha,
                         19 => CompressionFormat.Bc1,
                         22 => CompressionFormat.Bc3,
-                        //23 => CompressionFormat.bc,
-                        //28 => CompressionFormat.Bc5,
                         _ => CompressionFormat.Unknown
                     };
 
                     if (format == CompressionFormat.Unknown)
                     {
-                        Console.WriteLine("Unknown texture compression method {0} for {1}, w={2} h={3} comp={4} uncomp={5}", textureCompression, rrtexPath, w, h, sizeCompressed[0], sizeUncompressed[0]);
+                        unhandledTextureMessages.Add(string.Format(
+                            "Unknown texture compression method {0} for {1}, w={2} h={3} comp={4} uncomp={5}",
+                            textureCompression, rrtexPath, w, h, sizeCompressed[count - 1], sizeUncompressed[count - 1]
+                        ));
                         continue;
                     }
 
-                    var outColors = decoder.DecodeRaw(data.ToArray(), w, h, format);
-
-                    Bitmap bitmap = new Bitmap(w, h);
-                    for (int x = 0; x < w; x++)
-                    {
-                        for (int y = 0; y < h; y++)
-                        {
-                            var color = outColors[x + w * y];
-
-                            if (textureCompression == 18 || textureCompression == 19)
-                            {
-                                bitmap.SetPixel(x, y, Color.FromArgb(color.a, color.r, color.g, color.b));
-                            }
-                            else
-                            {
-                                bitmap.SetPixel(x, y, Color.FromArgb(255 - color.a, color.r, color.g, color.b));
-                            }
-                        }
-                    }
+                    using Image<Rgba32> image = decoder.DecodeRawToImageRgba32(data.ToArray(), w, h, format);
 
                     var outImagePath = Path.Join(outPath, $"{outRelativePath}_mip{i}.png");
                     Directory.CreateDirectory(Path.GetDirectoryName(outImagePath));
-                    bitmap.Save(outImagePath);
-
-                    width = Math.Max(1, width / 2);
-                    height = Math.Max(1, height / 2);
+                    image.SaveAsPng(outImagePath);
                 }
             }
 
@@ -214,4 +198,10 @@ using (var progress = new ProgressBar())
         processed++;
         progress.Report((double)processed / rgdPaths.Length);
     }
+}
+
+Console.WriteLine("Done, {0} unhandled textures:", unhandledTextureMessages.Count);
+foreach (var unhandledTextureMessage in unhandledTextureMessages)
+{
+    Console.WriteLine(unhandledTextureMessage);
 }
