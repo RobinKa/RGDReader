@@ -1,4 +1,6 @@
 # RGD Reader
+**This project was a proof of concept and is now being superseded by [AOEMods.Essence](https://github.com/aoemods/AOEMods.Essence) which should be used instead.**
+
 This project provides a library, a command line interface too and a graphical user interface for reading Age of Empire 4 Relic Chunky archives such as `.rgd` and `.rrtex`.
 
 Join the AOE4 modding discord for information sharing and discussions: https://discord.gg/h8FX9Uq3vG
